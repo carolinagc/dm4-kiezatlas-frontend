@@ -1,4 +1,16 @@
 dm4-kiezatlas-frontend
 ======================
 
-Front-end for Kiezatlas 2
+Kiezatlas 2 Frontend
+
+Requirements
+------------
+
+Installation
+------------
+
+Usage
+------------
+
+Version History
+---------------

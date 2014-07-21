@@ -14,12 +14,9 @@ import javax.ws.rs.Produces;
 @Path("/kiezatlas-frontend/")
 @Produces("text/html")
     public class FrontendPlugin extends PluginActivator {
-
-@GET
-@Path("index")
-
-	 public Viewable index() {
-	 return new Viewable("/index.html", null);
-	 
+      @GET
+      @Path("index")
+	  public Viewable index() {
+	  return new Viewable("/index.html", null);
      }
     }

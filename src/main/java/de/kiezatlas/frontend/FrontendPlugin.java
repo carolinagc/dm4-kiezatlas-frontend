@@ -11,12 +11,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-@Path("/kiezatlas-frontend/")
+@Path("/kiezatlas-frontend")
 @Produces("text/html")
     public class FrontendPlugin extends PluginActivator {
       @GET
-      @Path("index")
+      @Path("/")
 	  public Viewable index() {
-	  return new Viewable("/index.html", null);
+	  return new Viewable("index.html", null);
      }
     }

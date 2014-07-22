@@ -15,25 +15,4 @@
         <version>4.4-SNAPSHOT</version>
     </parent>
 
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>de.kiezatlas.frontend</Bundle-SymbolicName>
-                        <Bundle-Activator>
-			  de.kiezatlas.frontend.FrontendPlugin
-                        </Bundle-Activator>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-
-
-
 </project>

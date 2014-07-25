@@ -1,1 +1,22 @@
-#map { height: 480px; }
+#wrap{
+    width: 100%;
+}
+
+#map{
+    height: 600px;
+    width: 75%;
+    float: left;
+}
+
+
+#map2{
+    height: 600px;
+    width: 75%;
+    float: left;
+
+
+#sideBar{
+    margin-left: 10px; 
+    float: right;
+    width: 20%;
+}

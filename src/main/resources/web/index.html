@@ -12,8 +12,14 @@
   </head>
   <body>
     <div id="wrap">
-      <leaflet>      </leaflet>
-      <div id="sideBar">{{ "Kiezatlas" + ":-)" }}</div>
+      <leaflet></leaflet>
+      <div id="sideBar" ng-controller="kiezatlasController">
+	<ul>
+	  <li ng-repeat="criterion in criteria">{{criterion.value}}</li>
+	</ul>
+
+	{{ "Kiezatlas" + ":-)" }}
+      </div>
     </div>
   </body>
 </html>

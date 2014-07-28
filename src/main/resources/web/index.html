@@ -5,8 +5,6 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <link rel="stylesheet" href="stylesheets/kiezatlas-frontend.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    <script src="scripts/vendor/angular.min.js"></script>
-    <script type="text/javascript" src="scripts/app.js"></script>
     
     <title>Kiezatlas</title>
   </head>
@@ -17,12 +15,16 @@
 	<ul>
 	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>
-	<div ng-show="selectedCriteria(currentCriteria)">
-	  This is dummy data with the following criteria: {{showCriteria}}
+	<div ng-show="currentCriteria">
+	  This is dummy data with the following criteria: {{currentCriteria}}
 	</div>
 
 	{{ "Kiezatlas" + ":-)" }}
       </div>
     </div>
+
+    <script src="scripts/vendor/angular.min.js"></script>
+    <script type="text/javascript" src="scripts/app.js"></script>
+
   </body>
 </html>

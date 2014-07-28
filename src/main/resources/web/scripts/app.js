@@ -7,13 +7,8 @@ app.controller('criteriaController', function($scope, frontendService) {
 
     $scope.selectCriteria = function(selectedCriteria) {
 	$scope.currentCriteria = selectedCriteria.value;
-	console.log(selectedCriteria.value);
     };
 
-    $scope.selectedCriteria = function(currentCriteria) {
-	return $scope.showCriteria = currentCriteria;
-
-    }
  
 });
 

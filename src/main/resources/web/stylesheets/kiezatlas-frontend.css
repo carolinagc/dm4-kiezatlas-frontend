@@ -2,12 +2,13 @@
     width: 100%;
 }
 
-#map{
-    height: 600px;
+
+#map {
+    position: absolute;
+    height: 100%;
     width: 75%;
     float: left;
 }
-
 
 #sideBar{
     margin-left: 10px; 

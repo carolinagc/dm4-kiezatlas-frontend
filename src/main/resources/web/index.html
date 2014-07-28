@@ -13,10 +13,13 @@
   <body>
     <div id="wrap">
       <leaflet></leaflet>
-      <div id="sideBar" ng-controller="kiezatlasController">
+      <div id="sideBar" ng-controller="criteriaController">
 	<ul>
-	  <li ng-repeat="criterion in criteria">{{criterion.value}}</li>
+	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>
+	<div ng-show="selectedCriteria(currentCriteria)">
+	  This is dummy data with the following criteria: {{showCriteria}}
+	</div>
 
 	{{ "Kiezatlas" + ":-)" }}
       </div>

@@ -1,12 +1,22 @@
 var app = angular.module('kiezatlasFrontend', []);
 
-app.controller('kiezatlasController', function($scope, frontendService) {
+app.controller('criteriaController', function($scope, frontendService) {
     frontendService.getAllCriteria(function(criteria) {
-	console.log(criteria);
 	$scope.criteria = criteria;
     });
 
+    $scope.selectCriteria = function(selectedCriteria) {
+	$scope.currentCriteria = selectedCriteria.value;
+	console.log(selectedCriteria.value);
+    };
+
+    $scope.selectedCriteria = function(currentCriteria) {
+	return $scope.showCriteria = currentCriteria;
+
+    }
+ 
 });
+
 
 app.directive("leaflet", function() {
     return {

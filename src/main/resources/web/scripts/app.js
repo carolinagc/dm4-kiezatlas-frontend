@@ -6,17 +6,12 @@ app.controller('criteriaController', function($scope, frontendService) {
     });
 
 
-    frontendService.getCriteriaCategories("ka2.criteria.angebot", function(criteriaCategories) {
-        $scope.criteriaCategories = criteriaCategories.items;
-        console.log("This are the categories"+criteriaCategories.items);
-    });
-
-
     $scope.selectCriteria = function(selectedCriteria) {
 	$scope.currentCriteria = selectedCriteria.value;
-	$scope.currentCriteriaUri = selectedCriteria.uri;
+	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
+            $scope.criteriaCategories = criteriaCategories.items;
+   	});
     };
-
 });
 
 
@@ -31,12 +26,10 @@ app.directive("leaflet", function() {
 	    }).addTo(map);
 	    var marker = L.marker([52.52, 13.41]).addTo(map).bindPopup('Hello. <br> World?.')
 		.openPopup();
-	    
 	}
     };
-
-
 });
+
 
 
 app.service("frontendService", function($http) {

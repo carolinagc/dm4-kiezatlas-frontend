@@ -16,13 +16,14 @@
 	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>
 	<div ng-show="currentCriteria">
-	  This is dummy data with the following criteria: {{currentCriteria}}
+	{{ "Kiezatlas" + ":-)" }}
+	  This is dummy data with the following criteria: 
 	  <ul>
 	    <li ng-repeat="category in criteriaCategories" > {{category.value}}</li>
 	  </ul>
 	</div>
 
-	{{ "Kiezatlas" + ":-)" }}
+
       </div>
     </div>
 

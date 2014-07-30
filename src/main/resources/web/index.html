@@ -19,7 +19,7 @@
 	{{ "Kiezatlas" + ":-)" }}
 	  This is dummy data with the following criteria: 
 	  <ul>
-	    <li ng-repeat="category in criteriaCategories" > {{category.value}}</li>
+	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> {{category.value}}</li>
 	  </ul>
 	</div>
 

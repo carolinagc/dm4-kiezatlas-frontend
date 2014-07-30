@@ -17,6 +17,9 @@
 	</ul>
 	<div ng-show="currentCriteria">
 	  This is dummy data with the following criteria: {{currentCriteria}}
+	  <ul>
+	    <li ng-repeat="category in criteriaCategories" > {{category.value}}</li>
+	  </ul>
 	</div>
 
 	{{ "Kiezatlas" + ":-)" }}

@@ -5,11 +5,18 @@ app.controller('criteriaController', function($scope, frontendService) {
 	$scope.criteria = criteria;
     });
 
+
+    frontendService.getCriteriaCategories("ka2.criteria.angebot", function(criteriaCategories) {
+        $scope.criteriaCategories = criteriaCategories.items;
+        console.log("This are the categories"+criteriaCategories.items);
+    });
+
+
     $scope.selectCriteria = function(selectedCriteria) {
 	$scope.currentCriteria = selectedCriteria.value;
+	$scope.currentCriteriaUri = selectedCriteria.uri;
     };
 
- 
 });
 
 
@@ -36,6 +43,10 @@ app.service("frontendService", function($http) {
     this.getAllCriteria = function(callback) {
 	$http.get("/site/criteria").success(callback);
     };
-});
 
+    this.getCriteriaCategories = function(criteriaTypeUri, callback) {
+        $http.get("/core/topic/by_type/" + criteriaTypeUri).success(callback);
+    };
+
+});
 

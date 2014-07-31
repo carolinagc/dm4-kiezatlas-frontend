@@ -1,6 +1,6 @@
 var app = angular.module('kiezatlasFrontend', []);
 
-app.controller('criteriaController', function($scope, frontendService) {
+app.controller('sidebarController', function($scope, frontendService) {
     frontendService.getAllCriteria(function(criteria) {
 	$scope.criteria = criteria;
     });

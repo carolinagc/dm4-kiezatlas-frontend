@@ -11,7 +11,7 @@
   <body>
     <div id="wrap">
       <leaflet></leaflet>
-      <div id="sideBar" ng-controller="criteriaController">
+      <div id="sideBar" ng-controller="sidebarController">
 	<ul>
 	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>

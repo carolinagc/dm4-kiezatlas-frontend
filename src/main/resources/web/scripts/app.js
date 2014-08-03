@@ -5,12 +5,19 @@ app.controller('sidebarController', function($scope, frontendService) {
 	$scope.criteria = criteria;
     });
 
-
     $scope.selectCriteria = function(selectedCriteria) {
 	$scope.currentCriteria = selectedCriteria.value;
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
             $scope.criteriaCategories = criteriaCategories.items;
-   	});
+	});
+	$scope.showCategoryGeoObjects = function(category){
+	    frontendService.getGeoObjectsByCategory(category.id, function(categoryGeoObjects) {
+		$scope.categoryObjects = [];
+		$scope.categoryGeoObjects = categoryGeoObjects;
+		
+	    });		
+	};
+	
     };
 });
 
@@ -39,6 +46,10 @@ app.service("frontendService", function($http) {
 
     this.getCriteriaCategories = function(criteriaTypeUri, callback) {
         $http.get("/core/topic/by_type/" + criteriaTypeUri).success(callback);
+    };
+
+    this.getGeoObjectsByCategory = function (categoryId, callback){
+        $http.get("/site/category/" + categoryId + "/objects").success(callback);
     };
 
 });

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-    <link rel="stylesheet" href="stylesheets/kiezatlas-frontend.css" />
+    <link rel="stylesheet" href="/de.kiezatlas.frontend/stylesheets/kiezatlas-frontend.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     
     <title>Kiezatlas</title>
@@ -22,15 +22,11 @@
 	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href ng-click="showCategoryGeoObjects(category)" >{{category.value}} </a> :: ID: {{category.id}} </li>
 	  </ul>
 	</div>
-	<div ng-show="categoryGeoObjects">
-	  {{categoryGeoObjects}}
-      </div>
-
       </div>
     </div>
 
-    <script src="scripts/vendor/angular.min.js"></script>
-    <script type="text/javascript" src="scripts/app.js"></script>
+    <script src="/de.kiezatlas.frontend/scripts/vendor/angular.min.js"></script>
+    <script src="/de.kiezatlas.frontend/scripts/app.js"></script>
 
   </body>
 </html>

@@ -19,9 +19,12 @@
 	{{ "Kiezatlas" + ":-)" }}
 	  This is dummy data with the following criteria: 
 	  <ul>
-	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href ng-click="showCategoryGeoObjects(category)" >{{category.value}} </a> :: ID: {{category.id}} :: {{categoryGeoObjects}}</li>
+	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href ng-click="showCategoryGeoObjects(category)" >{{category.value}} </a> :: ID: {{category.id}} </li>
 	  </ul>
 	</div>
+	<div ng-show="categoryGeoObjects">
+	  {{categoryGeoObjects}}
+      </div>
 
       </div>
     </div>

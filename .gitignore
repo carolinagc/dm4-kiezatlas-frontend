@@ -1,0 +1,16 @@
+bin/
+deepamehta-db/
+runner/
+target/
+#*#
+
+*~
+.project
+.classpath
+.settings
+.shell_history
+
+modules-external/
+.DS_Store
+commit-message.txt
+*.tmproj

@@ -32,6 +32,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 		var lon = geoCoord["dm4.geomaps.longitude"].value;
 		var lat = geoCoord["dm4.geomaps.latitude"].value;
 		console.log(lon, lat);
+		$scope.map.addMarker(lon, lat);
 	    });
 	});		
     };
@@ -43,13 +44,18 @@ app.directive("leaflet", function() {
     return {
 	restrict: 'E',
 	template: '<div id="map"></div>',
-	link: function () {
+	link: function(scope) {
+	    console.log("link function called")
 	    var map = L.map('map').setView([52.52, 13.41], 16);
 	    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 	    }).addTo(map);
-	    var marker = L.marker([52.52, 13.41]).addTo(map).bindPopup('Hello. <br> World?.')
-		.openPopup();
+	    scope.map = {
+		addMarker: function (lon, lat) {
+		    L.marker([lat, lon]).addTo(map).bindPopup('Hello. <br> World?.')
+		    .openPopup();
+		}
+	    }
 	}
     };
 });

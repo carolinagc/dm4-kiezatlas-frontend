@@ -19,6 +19,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 
     $scope.selectCriteria = function(selectedCriteria) {
 	$scope.currentCriteria = selectedCriteria.value;
+	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
             $scope.criteriaCategories = criteriaCategories.items;
 	});
@@ -33,6 +34,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 		var lat = geoCoord["dm4.geomaps.latitude"].value;
 		console.log(lon, lat);
 		$scope.map.addMarker(lon, lat);
+		
 	    });
 	});		
     };
@@ -46,14 +48,28 @@ app.directive("leaflet", function() {
 	template: '<div id="map"></div>',
 	link: function(scope) {
 	    console.log("link function called")
-	    var map = L.map('map').setView([52.52, 13.41], 16);
-	    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+	    var markersLayer = new L.layerGroup();
+	    var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-	    }).addTo(map);
+	    });
+
+	    var map = L.map('map', {
+		center: [52.52, 13.41],
+		zoom: 13,
+		layers: [baseLayer]
+	    });
+
+
 	    scope.map = {
 		addMarker: function (lon, lat) {
-		    L.marker([lat, lon]).addTo(map).bindPopup('Hello. <br> World?.')
+		    var marker = L.marker([lat, lon]).addTo(markersLayer).bindPopup('Hello. <br> World?.')
 		    .openPopup();
+		    markersLayer.addTo(map);
+		    console.log("ADD TO markersLayer" + markersLayer);
+		},
+		removeMarkers: function(){
+		    console.log("REMOVE markersLayer" + markersLayer);
+		    markersLayer.clearLayers();
 		}
 	    }
 	}

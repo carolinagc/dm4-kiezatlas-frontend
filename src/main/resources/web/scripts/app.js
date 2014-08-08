@@ -25,13 +25,17 @@ app.controller('sidebarController', function($scope, frontendService) {
 	});
     };
 
+
     $scope.showCategoryGeoObjects = function(category){
 	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
+	    $scope.geoObjectsValue = [];
 	    console.log(geoObjects);
 	    angular.forEach(geoObjects, function(geoObject) {
 		var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
 		var lon = geoCoord["dm4.geomaps.longitude"].value;
 		var lat = geoCoord["dm4.geomaps.latitude"].value;
+		$scope.geoObjectsValue.push(geoObject.value);
+		console.log("Value geoObject " + geoObject.value);
 		console.log(lon, lat);
 		$scope.map.addMarker(lon, lat);
 		

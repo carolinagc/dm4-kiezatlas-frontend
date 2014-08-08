@@ -15,13 +15,21 @@
 	<ul>
 	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>
-	<div ng-show="currentCriteria">
+	<div >
 	{{ "Kiezatlas" + ":-)" }}
 	  This is dummy data with the following criteria: 
 	  <ul>
-	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href ng-click="showCategoryGeoObjects(category)" >{{category.value}} </a> :: ID: {{category.id}} </li>
+	    <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href  ng-click="showCategoryGeoObjects(category)">{{category.value}} </a>
+	    </li>
 	  </ul>
 	</div>
+	<div ng-if="geoObjectsValue">
+	  <ul>
+	    <li ng-repeat="geoObjectValue in geoObjectsValue"><a href >{{geoObjectValue}}</li>
+	  </ul>
+	</div>
+	
+
       </div>
     </div>
 

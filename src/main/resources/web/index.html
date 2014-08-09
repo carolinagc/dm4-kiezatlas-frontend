@@ -25,8 +25,12 @@
 	  </div>
 	  <div  ng-show="!showCategories">
 	    <ul>
-	      <li ng-repeat="geoObjectValue in geoObjectsValue"><a href >{{geoObjectValue}}</li>
+	      <li ng-repeat="geoObject in geoObjects"><a href ng-click="showGeoObjectDetails(geoObject.id)">{{geoObject.value}}</a></li>
 	    </ul>
+	  </div>
+	  <div ng-show="showDetails">
+	    Detail object name {{detailGeoObject.value}}
+
 	  </div>
 
 

@@ -1,7 +1,7 @@
 /*
 ViewModel
     criteria - the criteria shown upper/left (array of topics)
-    currentCriteria - name of selected criteria (string)
+    currentCriteria - name of selected criteria (string) #TODO Check if still needed
     criteriaCategories - the categories shown in the lower/left (array of topics)
 
 
@@ -22,28 +22,55 @@ app.controller('sidebarController', function($scope, frontendService) {
 	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
 	    $scope.showCategories = true;
+	    $scope.showDetails = false;
             $scope.criteriaCategories = criteriaCategories.items;
 	});
     };
 
 
-    $scope.showCategoryGeoObjects = function(category){
+    $scope.showCategoryGeoObjects = function(category) {
 	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
 	    $scope.showCategories = false;
-	    $scope.geoObjectsValue = [];
+	    $scope.showDetails = false;
+	    $scope.geoObjects = geoObjects;
 	    console.log(geoObjects);
 	    angular.forEach(geoObjects, function(geoObject) {
 		var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
 		var lon = geoCoord["dm4.geomaps.longitude"].value;
 		var lat = geoCoord["dm4.geomaps.latitude"].value;
-		$scope.geoObjectsValue.push(geoObject.value);
-		console.log("Value geoObject " + geoObject.value);
 		console.log(lon, lat);
 		$scope.map.addMarker(lon, lat);
-		
 	    });
 	});		
     };
+
+    $scope.showGeoObjectDetails = function(geoObjectId) {
+	$scope.showDetails = true;
+	var FACET_TYPE_URIS = [
+	    "ka2.kontakt.facet",
+	    "ka2.website.facet",
+	    "ka2.beschreibung.facet",
+	    "ka2.oeffnungszeiten.facet",
+	    "ka2.traeger.facet",
+	    //
+	    "ka2.criteria.thema.facet",
+	    "ka2.criteria.angebot.facet",
+	    "ka2.criteria.zielgruppe.facet",
+	    "ka2.criteria.traeger.facet",
+	    "ka2.criteria.ueberregional.facet"
+	];
+
+	frontendService.getFacettedGeoObjects(geoObjectId, FACET_TYPE_URIS, function(geoObject) {
+	    console.log("Detail geo object", geoObject);
+	    // trust user provided HTML
+	    //  	    trustUserHTML(geoObject, "ka2.beschreibung")
+	    //	    trustUserHTML(geoObject, "ka2.oeffnungszeiten")
+	    //
+	    $scope.detailGeoObject = geoObject;
+	});
+    };
+
+
 
 });
 
@@ -95,6 +122,18 @@ app.service("frontendService", function($http) {
 
     this.getGeoObjectsByCategory = function (categoryId, callback){
         $http.get("/site/category/" + categoryId + "/objects").success(callback);
+    };
+
+    this.getFacettedGeoObjects = function(geoObjectId, facetTypeUris, callback){
+	$http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris)).success(callback)
+    };
+
+    function queryString(paramName, values) {
+	var params = [];
+	angular.forEach(values, function(value) {
+	    params.push(paramName + "=" + value);
+	})
+	return params.join("&");
     };
 
 });

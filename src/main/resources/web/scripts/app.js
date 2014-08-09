@@ -3,7 +3,8 @@ ViewModel
     criteria - the criteria shown upper/left (array of topics)
     currentCriteria - name of selected criteria (string) #TODO Check if still needed
     criteriaCategories - the categories shown in the lower/left (array of topics)
-
+    geoObjects - the geoObjects of a specific category
+    detailGeoObject - the details of a geoObject
 
 */
 

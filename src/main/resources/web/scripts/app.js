@@ -21,6 +21,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 	$scope.currentCriteria = selectedCriteria.value;
 	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
+	    $scope.showCategories = true;
             $scope.criteriaCategories = criteriaCategories.items;
 	});
     };
@@ -28,6 +29,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 
     $scope.showCategoryGeoObjects = function(category){
 	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
+	    $scope.showCategories = false;
 	    $scope.geoObjectsValue = [];
 	    console.log(geoObjects);
 	    angular.forEach(geoObjects, function(geoObject) {

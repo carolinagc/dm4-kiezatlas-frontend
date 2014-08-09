@@ -68,6 +68,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 	    //	    trustUserHTML(geoObject, "ka2.oeffnungszeiten")
 	    //
 	    $scope.detailGeoObject = geoObject;
+	    console.log("Details description" + geoObject.composite["ka2.beschreibung"].value);
 	});
     };
 

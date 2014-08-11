@@ -18,22 +18,27 @@
 	  <div ng-show="showCategories">
 	    {{ "Kiezatlas" + ":-)" }}
 	    This is dummy data with the following criteria: 
+	    <input type="text" ng-model="value">
 	    <ul>
-	      <li ng-repeat="category in criteriaCategories | orderBy:'value'"> <a href ng-click="showCategoryGeoObjects(category)">{{category.value}} </a>
+	      <li ng-repeat="category in criteriaCategories | filter:value | orderBy:'value'">
+		<a href ng-click="showCategoryGeoObjects(category)">{{category.value}}</a>
 	      </li>
 	    </ul>
 	  </div>
-	  <div  ng-show="!showCategories">
+
+	  <div  ng-hide="showCategories">
+	    <a href ng-click="selectCriteria(currentCriteria)">{{currentCriteria.value}}</a> >>
+	    <a href ng-click="showCategoryGeoObjects(currentCategory)">{{currentCategory.value}}</a>
 	    <ul>
-	      <li ng-repeat="geoObject in geoObjects"><a href ng-click="showGeoObjectDetails(geoObject.id)">{{geoObject.value}}</a></li>
+	      <li ng-repeat="geoObject in geoObjects">
+		<a href="#" ng-click="showGeoObjectDetails(geoObject.id); showDetails = ! showDetails">{{geoObject.value}}</a>
+		<div  ng-show="showDetails">
+		  Detail object name {{detailGeoObject.value}}
+		  Detail object description {{detailGeoObject.composite["ka2.beschreibung"].value}}
+		</div>
+	      </li>
 	    </ul>
 	  </div>
-	  <div ng-show="showDetails">
-	    Detail object name {{detailGeoObject.value}}
-	    Detail object description {{detailGeoObject.composite["ka2.beschreibung"].value}}
-	  </div>
-
-
       </div>
     </div>
 

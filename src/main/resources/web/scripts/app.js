@@ -1,13 +1,12 @@
 /*
 ViewModel
     criteria - the criteria shown upper/left (array of topics)
-    currentCriteria - name of selected criteria (string) #TODO Check if still needed
+    currentCriteria - selected criteria (topic)
     criteriaCategories - the categories shown in the lower/left (array of topics)
     geoObjects - the geoObjects of a specific category
     detailGeoObject - the details of a geoObject
 
 */
-
 
 
 var app = angular.module('kiezatlasFrontend', []);
@@ -19,7 +18,7 @@ app.controller('sidebarController', function($scope, frontendService) {
     });
 
     $scope.selectCriteria = function(selectedCriteria) {
-	$scope.currentCriteria = selectedCriteria.value;
+	$scope.currentCriteria = selectedCriteria;
 	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
 	    $scope.showCategories = true;
@@ -31,8 +30,9 @@ app.controller('sidebarController', function($scope, frontendService) {
 
     $scope.showCategoryGeoObjects = function(category) {
 	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
+	    $scope.currentCategory = category;
 	    $scope.showCategories = false;
-	    $scope.showDetails = false;
+//	    $scope.showDetails = false;
 	    $scope.geoObjects = geoObjects;
 	    console.log(geoObjects);
 	    angular.forEach(geoObjects, function(geoObject) {
@@ -46,7 +46,7 @@ app.controller('sidebarController', function($scope, frontendService) {
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
-	$scope.showDetails = true;
+//	$scope.showDetails = false;
 	var FACET_TYPE_URIS = [
 	    "ka2.kontakt.facet",
 	    "ka2.website.facet",
@@ -60,6 +60,7 @@ app.controller('sidebarController', function($scope, frontendService) {
 	    "ka2.criteria.traeger.facet",
 	    "ka2.criteria.ueberregional.facet"
 	];
+
 
 	frontendService.getFacettedGeoObjects(geoObjectId, FACET_TYPE_URIS, function(geoObject) {
 	    console.log("Detail geo object", geoObject);

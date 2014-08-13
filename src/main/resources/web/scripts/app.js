@@ -1,5 +1,6 @@
 /*
 ViewModel
+    state - The state the application is in, there are 4 states: "initial", "category list", "geo object list", "geo object details"
     criteria - the criteria shown upper/left (array of topics)
     currentCriteria - selected criteria (topic)
     criteriaCategories - the categories shown in the lower/left (array of topics)
@@ -14,6 +15,7 @@ var app = angular.module('kiezatlasFrontend', []);
 app.controller('sidebarController', function($scope, frontendService) {
 
     frontendService.getAllCriteria(function(criteria) {
+	$scope.state="initial";
 	$scope.criteria = criteria;
     });
 
@@ -21,18 +23,16 @@ app.controller('sidebarController', function($scope, frontendService) {
 	$scope.currentCriteria = selectedCriteria;
 	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
-	    $scope.showCategories = true;
-	    $scope.showDetails = false;
-            $scope.criteriaCategories = criteriaCategories.items;
+	    $scope.state="category list";
+            $scope.categories = criteriaCategories.items;
 	});
     };
 
 
-    $scope.showCategoryGeoObjects = function(category) {
+    $scope.selectCategory = function(category) {
 	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
 	    $scope.currentCategory = category;
-	    $scope.showCategories = false;
-//	    $scope.showDetails = false;
+	    $scope.state="geo object list";
 	    $scope.geoObjects = geoObjects;
 	    console.log(geoObjects);
 	    angular.forEach(geoObjects, function(geoObject) {
@@ -46,7 +46,7 @@ app.controller('sidebarController', function($scope, frontendService) {
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
-//	$scope.showDetails = false;
+	$scope.state="geo object details";
 	var FACET_TYPE_URIS = [
 	    "ka2.kontakt.facet",
 	    "ka2.website.facet",
@@ -69,12 +69,10 @@ app.controller('sidebarController', function($scope, frontendService) {
 	    //	    trustUserHTML(geoObject, "ka2.oeffnungszeiten")
 	    //
 	    $scope.detailGeoObject = geoObject;
+
 	    console.log("Details description" + geoObject.composite["ka2.beschreibung"].value);
 	});
     };
-
-
-
 });
 
 

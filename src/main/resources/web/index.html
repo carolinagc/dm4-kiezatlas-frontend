@@ -9,9 +9,9 @@
     <title>Kiezatlas</title>
   </head>
   <body>
-    <div id="wrap">
+    <div id="wrap" ng-controller="sidebarController">
       <leaflet></leaflet>
-      <div id="sideBar" ng-controller="sidebarController">
+      <div id="sideBar">
 	<ul>
 	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
 	</ul>

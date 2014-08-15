@@ -15,16 +15,15 @@ var app = angular.module('kiezatlasFrontend', []);
 app.controller('sidebarController', function($scope, frontendService) {
 
     frontendService.getAllCriteria(function(criteria) {
-	$scope.state="initial";
 	$scope.criteria = criteria;
     });
 
     $scope.selectCriteria = function(selectedCriteria) {
+	if ($scope.currentCriteria != selectedCriteria ){$scope.map.removeMarkers();};
 	$scope.currentCriteria = selectedCriteria;
-	$scope.map.removeMarkers();
 	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
 	    $scope.state="category list";
-            $scope.categories = criteriaCategories.items;
+	    $scope.categories = criteriaCategories.items;
 	});
     };
 
@@ -40,12 +39,13 @@ app.controller('sidebarController', function($scope, frontendService) {
 		var lon = geoCoord["dm4.geomaps.longitude"].value;
 		var lat = geoCoord["dm4.geomaps.latitude"].value;
 		console.log(lon, lat);
-		$scope.map.addMarker(lon, lat);
+		$scope.map.addMarker(lon, lat, geoObject.id);
 	    });
 	});		
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
+	console.log("when showDetails the STATE is: " + $scope.state);
 	$scope.state="geo object details";
 	var FACET_TYPE_URIS = [
 	    "ka2.kontakt.facet",
@@ -82,23 +82,22 @@ app.directive("leaflet", function() {
 	template: '<div id="map"></div>',
 	link: function(scope) {
 	    console.log("link function called")
-	    var markersLayer = new L.layerGroup();
+	    var markersLayer = L.layerGroup();
 	    var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 		attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 	    });
 
 	    var map = L.map('map', {
-		center: [52.52, 13.41],
-		zoom: 13,
-		layers: [baseLayer]
+		center: [52.5, 13.43],
+		zoom: 14,
+		layers: [baseLayer, markersLayer]
 	    });
 
-
 	    scope.map = {
-		addMarker: function (lon, lat) {
-		    var marker = L.marker([lat, lon]).addTo(markersLayer).bindPopup('Hello. <br> World?.')
-		    .openPopup();
-		    markersLayer.addTo(map);
+		addMarker: function (lon, lat, geoObjectId) {
+		    var marker = L.marker([lat, lon]).addTo(markersLayer).on('click', function(e) {
+			scope.showGeoObjectDetails(geoObjectId);
+		    });
 		    console.log("ADD TO markersLayer" + markersLayer);
 		},
 		removeMarkers: function(){
@@ -113,6 +112,11 @@ app.directive("leaflet", function() {
 
 
 app.service("frontendService", function($http) {
+
+    this.getSiteId = function(geomap_id) {
+	$http.get( "/site/geomap/" + geomap_id).success(callback);
+    }
+
     this.getAllCriteria = function(callback) {
 	$http.get("/site/criteria").success(callback);
     };

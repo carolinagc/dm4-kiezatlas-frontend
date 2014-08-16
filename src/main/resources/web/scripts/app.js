@@ -76,6 +76,13 @@ app.controller('sidebarController', function($scope, frontendService) {
 });
 
 
+app.directive("breadcrumb", function() {
+    return {
+	restrict: 'E',
+	template: '<span><a href ng-click="selectCriteria(currentCriteria)">{{currentCriteria.value}}</a> >> <a href ng-click="selectCategory(currentCategory)">{{currentCategory.value}}</a><p/></span>'
+    }
+});
+
 app.directive("leaflet", function() {
     return {
 	restrict: 'E',

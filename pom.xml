@@ -23,6 +23,9 @@
 	  <configuration>
 	    <instructions>
 	      <Bundle-SymbolicName>de.kiezatlas.frontend</Bundle-SymbolicName>
+	      <Bundle-Activator>
+		de.kiezatlas.frontend.KiezatlasFrontendPlugin
+	      </Bundle-Activator>
 	    </instructions>
 	  </configuration>
 	</plugin>

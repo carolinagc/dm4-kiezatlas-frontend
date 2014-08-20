@@ -6,13 +6,17 @@ ViewModel
     criteriaCategories - the categories shown in the lower/left (array of topics)
     geoObjects - the geoObjects of a specific category
     detailGeoObject - the details of a geoObject
+    currentCategory - the selected category (topic)
 
 */
 
 
 var app = angular.module('kiezatlasFrontend', []);
 
-app.controller('sidebarController', function($scope, frontendService) {
+/* Controllers */
+
+app.controller('sidebarController', function($scope,frontendService) {
+    var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
 
     frontendService.getAllCriteria(function(criteria) {
 	$scope.criteria = criteria;
@@ -47,33 +51,28 @@ app.controller('sidebarController', function($scope, frontendService) {
     $scope.showGeoObjectDetails = function(geoObjectId) {
 	console.log("when showDetails the STATE is: " + $scope.state);
 	$scope.state="geo object details";
-	var FACET_TYPE_URIS = [
-	    "ka2.kontakt.facet",
-	    "ka2.website.facet",
-	    "ka2.beschreibung.facet",
-	    "ka2.oeffnungszeiten.facet",
-	    "ka2.traeger.facet",
-	    //
-	    "ka2.criteria.thema.facet",
-	    "ka2.criteria.angebot.facet",
-	    "ka2.criteria.zielgruppe.facet",
-	    "ka2.criteria.traeger.facet",
-	    "ka2.criteria.ueberregional.facet"
-	];
-
-
-	frontendService.getFacettedGeoObjects(geoObjectId, FACET_TYPE_URIS, function(geoObject) {
-	    console.log("Detail geo object", geoObject);
+	frontendService.getWebsiteFacets(siteId).then(function(response) {
+	    console.log("geo object facets",  response.data);
+	    var facet_type_uris = [];
+	    angular.forEach(response.data.items, function(facet) {	    
+		facet_type_uris.push(facet.uri);
+	    });
+	    console.log("facet type uris", facet_type_uris)
+	    return frontendService.getFacettedGeoObject(geoObjectId, facet_type_uris)
+	}).then(function(response) {
+	    console.log("Detail geo object", response.data);
 	    // trust user provided HTML
 	    //  	    trustUserHTML(geoObject, "ka2.beschreibung")
 	    //	    trustUserHTML(geoObject, "ka2.oeffnungszeiten")
 	    //
-	    $scope.detailGeoObject = geoObject;
-
-	    console.log("Details description" + geoObject.composite["ka2.beschreibung"].value);
+	    $scope.detailGeoObject = response.data;
+	    console.log("Details description", $scope.detailGeoObject.composite["ka2.beschreibung"].value);
 	});
     };
 });
+
+
+/* Directives */
 
 
 app.directive("breadcrumb", function() {
@@ -106,6 +105,7 @@ app.directive("leaflet", function() {
 			scope.showGeoObjectDetails(geoObjectId);
 		    });
 		    console.log("ADD TO markersLayer" + markersLayer);
+		    console.log("currentCategory is " + scope.currentCategory.value);
 		},
 		removeMarkers: function(){
 		    console.log("REMOVE markersLayer" + markersLayer);
@@ -118,11 +118,9 @@ app.directive("leaflet", function() {
 
 
 
-app.service("frontendService", function($http) {
+/* Services */
 
-    this.getSiteId = function(geomap_id) {
-	$http.get( "/site/geomap/" + geomap_id).success(callback);
-    }
+app.service("frontendService", function($http) {
 
     this.getAllCriteria = function(callback) {
 	$http.get("/site/criteria").success(callback);
@@ -132,12 +130,16 @@ app.service("frontendService", function($http) {
         $http.get("/core/topic/by_type/" + criteriaTypeUri).success(callback);
     };
 
-    this.getGeoObjectsByCategory = function (categoryId, callback){
-        $http.get("/site/category/" + categoryId + "/objects").success(callback);
+    this.getGeoObjectsByCategory = function(categoryId, callback) {
+        $http.get("/site/category/" + categoryId + "/objects?fetch_composite=true").success(callback);
     };
 
-    this.getFacettedGeoObjects = function(geoObjectId, facetTypeUris, callback){
-	$http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris)).success(callback)
+    this.getWebsiteFacets = function(websiteId) {
+	return $http.get("/site/" + websiteId + "/facets");
+    };
+
+    this.getFacettedGeoObject = function(geoObjectId, facetTypeUris) {
+	return $http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris))
     };
 
     function queryString(paramName, values) {
@@ -150,3 +152,8 @@ app.service("frontendService", function($http) {
 
 });
 
+app.service("utilService", function() {
+    this.isArray = function(obj) {
+	return Object.prototype.toString.call(obj) == "[object Array]"
+    };
+});

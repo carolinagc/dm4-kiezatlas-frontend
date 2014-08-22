@@ -18,34 +18,34 @@ var app = angular.module('kiezatlasFrontend', []);
 app.controller('sidebarController', function($scope,frontendService) {
     var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
 
-    frontendService.getAllCriteria(function(criteria) {
-	$scope.criteria = criteria;
+    frontendService.getAllCriteria().then(function(response) {
+	    $scope.criteria = response.data;
     });
 
     $scope.selectCriteria = function(selectedCriteria) {
 	if ($scope.currentCriteria != selectedCriteria ){$scope.map.removeMarkers();};
 	$scope.currentCriteria = selectedCriteria;
-	frontendService.getCriteriaCategories(selectedCriteria.uri, function(criteriaCategories) {
-	    $scope.state="category list";
-	    $scope.categories = criteriaCategories.items;
-	});
+	    frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
+	        $scope.state="category list";
+	        $scope.categories = response.data.items;
+	    });
     };
 
 
     $scope.selectCategory = function(category) {
-	frontendService.getGeoObjectsByCategory(category.id, function(geoObjects) {
-	    $scope.currentCategory = category;
-	    $scope.state="geo object list";
-	    $scope.geoObjects = geoObjects;
-	    console.log(geoObjects);
-	    angular.forEach(geoObjects, function(geoObject) {
-		var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
-		var lon = geoCoord["dm4.geomaps.longitude"].value;
-		var lat = geoCoord["dm4.geomaps.latitude"].value;
-		console.log(lon, lat);
-		$scope.map.addMarker(lon, lat, geoObject.id);
-	    });
-	});		
+	    frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
+	        $scope.currentCategory = category;
+	        $scope.state="geo object list";
+	        $scope.geoObjects = response.data;
+	        console.log(response.data);
+	        angular.forEach(response.data, function(geoObject) {
+		        var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
+		        var lon = geoCoord["dm4.geomaps.longitude"].value;
+		        var lat = geoCoord["dm4.geomaps.latitude"].value;
+		        console.log(lon, lat);
+		        $scope.map.addMarker(lon, lat, geoObject.id);
+	        });
+	    });		
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
@@ -122,24 +122,24 @@ app.directive("leaflet", function() {
 
 app.service("frontendService", function($http) {
 
-    this.getAllCriteria = function(callback) {
-	$http.get("/site/criteria").success(callback);
+    this.getAllCriteria = function() {
+	    return $http.get("/site/criteria");
     };
 
-    this.getCriteriaCategories = function(criteriaTypeUri, callback) {
-        $http.get("/core/topic/by_type/" + criteriaTypeUri).success(callback);
+    this.getCriteriaCategories = function(criteriaTypeUri) {
+        return $http.get("/core/topic/by_type/" + criteriaTypeUri);
     };
 
-    this.getGeoObjectsByCategory = function(categoryId, callback) {
-        $http.get("/site/category/" + categoryId + "/objects?fetch_composite=true").success(callback);
+    this.getGeoObjectsByCategory = function(categoryId) {
+       return $http.get("/site/category/" + categoryId + "/objects?fetch_composite=true");
     };
 
     this.getWebsiteFacets = function(websiteId) {
-	return $http.get("/site/" + websiteId + "/facets");
+	    return $http.get("/site/" + websiteId + "/facets");
     };
 
     this.getFacettedGeoObject = function(geoObjectId, facetTypeUris) {
-	return $http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris))
+	    return $http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris))
     };
 
     function queryString(paramName, values) {

@@ -12,38 +12,45 @@
     <div id="wrap" ng-controller="sidebarController">
       <leaflet></leaflet>
       <div id="sideBar">
-	<ul>
-	  <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
-	</ul>
-	  <div ng-if="state=='category list'">
-	    Filter categories: <input type="text" ng-model="value">
-	    <ul>
-	      <li ng-repeat="category in categories | filter:value | orderBy:'value'">
-		<a href ng-click="selectCategory(category)">{{category.value}}</a>
-	      </li>
-	    </ul>
-	  </div>
-
-	  <div  ng-if="state=='geo object list'">
-	    <breadcrumb></breadcrumb>
-	    <ul>
-	      <li ng-repeat="geoObject in geoObjects">
-		<a href ng-click="showGeoObjectDetails(geoObject.id)">{{geoObject.value}}</a>
-	      </li>
-	    </ul>
-	  </div>
-	  
-	  <div  ng-if="state=='geo object details'">
-	    <breadcrumb></breadcrumb>
-	    Detail object name {{detailGeoObject.value}}
-	    Detail object description {{detailGeoObject.composite["ka2.beschreibung"].value}}
-	  </div>
-
+        <ul>
+          <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
+        </ul>
+        <div ng-if="state=='category list'">
+          Filter categories: <input type="text" ng-model="value">
+          <ul>
+            <li ng-repeat="category in categories | filter:value | orderBy:'value'">
+              <a href ng-click="selectCategory(category)">{{category.value}}</a>
+            </li>
+          </ul>
+        </div>
+        
+        <div  ng-if="state=='geo object list'">
+          <breadcrumb></breadcrumb>
+          <ul>
+            <li ng-repeat="geoObject in geoObjects">
+              <a href ng-click="showGeoObjectDetails(geoObject.id)">{{geoObject.value}}</a>
+            </li>
+          </ul>
+        </div>
+        
+        <div  ng-if="state=='geo object details'">
+          <breadcrumb></breadcrumb>
+          <b>Name</b> {{detailGeoObject.value}}
+          <b><br/> Addresse</b> {{detailGeoObject.composite["dm4.contacts.address"].value}}
+          <b ng-if="details['ka2.oeffnungszeiten']"><br/> Öffnungzeiten</b> {{details["ka2.oeffnungszeiten"]}}
+          <b ng-if="details['ka2.kontakt.telefon']"><br/> Telefon</b> {{details["ka2.kontakt.telefon"]}}
+          <b ng-if="details['ka2.kontakt.fax']"><br/> Fax</b> {{details["ka2.kontakt.fax"]}}
+          <b ng-if="details['ka2.kontakt.ansprechpartner']"> <br/> Ansprechpartner/in</b> {{details["ka2.kontakt.ansprechpartner"]}}
+          <b ng-if="details['ka2.kontakt.email']"><br/> Email</b> {{details["ka2.kontakt.email"]}}
+          <b ng-if="details['dm4.webbrowser.url']"><br/> Website</b> {{details["dm4.webbrowser.url"]}}
+          <b ng-if="details['ka2.beschreibung']"><br/> Description</b> {{detailGeoObject.composite["ka2.beschreibung"].value}}
+        </div>
+        
       </div>
     </div>
-
+    
     <script src="/de.kiezatlas.frontend/scripts/vendor/angular.min.js"></script>
     <script src="/de.kiezatlas.frontend/scripts/app.js"></script>
-
+    
   </body>
 </html>

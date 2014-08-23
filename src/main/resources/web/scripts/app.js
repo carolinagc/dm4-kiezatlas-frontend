@@ -15,7 +15,7 @@ var app = angular.module('kiezatlasFrontend', []);
 
 /* Controllers */
 
-app.controller('sidebarController', function($scope,frontendService) {
+app.controller('sidebarController', function($scope,frontendService, utilService) {
     var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
 
     frontendService.getAllCriteria().then(function(response) {
@@ -66,7 +66,24 @@ app.controller('sidebarController', function($scope,frontendService) {
         //      trustUserHTML(geoObject, "ka2.oeffnungszeiten")
         //
         $scope.detailGeoObject = response.data;
-        console.log("Details description", $scope.detailGeoObject.composite["ka2.beschreibung"].value);
+        var details = {};
+        angular.forEach(response.data.composite, function(detailsGeoObject) {
+            if (utilService.isArray(detailsGeoObject)) {
+                details[detailsGeoObject[0].type_uri]= detailsGeoObject[0].value ;
+            } else { 
+                if (detailsGeoObject.type_uri == "ka2.kontakt") {
+                    angular.forEach(detailsGeoObject.composite, function(kontakt) {
+                        details[kontakt.type_uri]= kontakt.value ;
+                        console.log("KONTAKT Value is", kontakt.type_uri, kontakt.value)
+                    });
+                } else { 
+                    details[detailsGeoObject.type_uri]= detailsGeoObject.value ;
+                }
+            }
+        });
+        
+        $scope.details = details;
+        console.log("details", $scope.details);
     });
     };
 });

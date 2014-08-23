@@ -37,19 +37,19 @@
           <breadcrumb></breadcrumb>
           <b>Name</b> {{detailGeoObject.value}}
           <b><br/> Addresse</b> {{detailGeoObject.composite["dm4.contacts.address"].value}}
-          <b ng-if="details['ka2.oeffnungszeiten']"><br/> Öffnungzeiten</b> {{details["ka2.oeffnungszeiten"]}}
+          <b><br/> Öffnungzeiten</b> <span ng-if="details['ka2.oeffnungszeiten']" ng-bind-html="details['ka2.oeffnungszeiten']"></span>
           <b ng-if="details['ka2.kontakt.telefon']"><br/> Telefon</b> {{details["ka2.kontakt.telefon"]}}
           <b ng-if="details['ka2.kontakt.fax']"><br/> Fax</b> {{details["ka2.kontakt.fax"]}}
           <b ng-if="details['ka2.kontakt.ansprechpartner']"> <br/> Ansprechpartner/in</b> {{details["ka2.kontakt.ansprechpartner"]}}
           <b ng-if="details['ka2.kontakt.email']"><br/> Email</b> {{details["ka2.kontakt.email"]}}
           <b ng-if="details['dm4.webbrowser.url']"><br/> Website</b> {{details["dm4.webbrowser.url"]}}
-          <b ng-if="details['ka2.beschreibung']"><br/> Description</b> {{detailGeoObject.composite["ka2.beschreibung"].value}}
+          <b><br/> Description</b> <span ng-if="details['ka2.beschreibung']" ng-bind-html="details['ka2.beschreibung']"></span> 
         </div>
-        
       </div>
     </div>
     
     <script src="/de.kiezatlas.frontend/scripts/vendor/angular.min.js"></script>
+    <script src="/de.kiezatlas.frontend/scripts/vendor/angular-sanitize.min.js"></script>
     <script src="/de.kiezatlas.frontend/scripts/app.js"></script>
     
   </body>

@@ -11,7 +11,7 @@ ViewModel
 */
 
 
-var app = angular.module('kiezatlasFrontend', []);
+var app = angular.module('kiezatlasFrontend', ['ngSanitize']);
 
 /* Controllers */
 

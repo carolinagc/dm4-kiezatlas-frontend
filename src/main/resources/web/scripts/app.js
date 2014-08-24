@@ -7,7 +7,7 @@ ViewModel
     geoObjects - the geoObjects of a specific category
     detailGeoObject - the details of a geoObject
     currentCategory - the selected category (topic)
-
+    details - the details values of a geoObject (object)
 */
 
 
@@ -61,14 +61,14 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         return frontendService.getFacettedGeoObject(geoObjectId, facet_type_uris)
     }).then(function(response) {
         console.log("Detail geo object", response.data);
-        // trust user provided HTML
-        //          trustUserHTML(geoObject, "ka2.beschreibung")
-        //      trustUserHTML(geoObject, "ka2.oeffnungszeiten")
-        //
         $scope.detailGeoObject = response.data;
         var details = {};
+        var geoObjCategories = [];
         angular.forEach(response.data.composite, function(detailsGeoObject) {
             if (utilService.isArray(detailsGeoObject)) {
+                if (detailsGeoObject[0].type_uri.indexOf("criteria")>0) {
+                    geoObjCategories.push(detailsGeoObject[0].value);
+                }
                 details[detailsGeoObject[0].type_uri]= detailsGeoObject[0].value ;
             } else { 
                 if (detailsGeoObject.type_uri == "ka2.kontakt") {
@@ -83,7 +83,9 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         });
         
         $scope.details = details;
+        $scope.geoObjCategories = geoObjCategories;
         console.log("details", $scope.details);
+        console.log("CATEGORY", geoObjCategories);
     });
     };
 });

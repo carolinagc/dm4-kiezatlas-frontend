@@ -43,7 +43,15 @@
           <b ng-if="details['ka2.kontakt.ansprechpartner']"> <br/> Ansprechpartner/in</b> {{details["ka2.kontakt.ansprechpartner"]}}
           <b ng-if="details['ka2.kontakt.email']"><br/> Email</b> {{details["ka2.kontakt.email"]}}
           <b ng-if="details['dm4.webbrowser.url']"><br/> Website</b> {{details["dm4.webbrowser.url"]}}
-          <b><br/> Description</b> <span ng-if="details['ka2.beschreibung']" ng-bind-html="details['ka2.beschreibung']"></span> 
+          <b><br/> Description</b> <span ng-if="details['ka2.beschreibung']" ng-bind-html="details['ka2.beschreibung']"> </span> 
+          <b><br/> Categories</b>
+          <ul>
+            <li ng-repeat="geoObjCat in geoObjCategories">
+              {{geoObjCat}}
+            </li>
+          </ul>
+
+
         </div>
       </div>
     </div>

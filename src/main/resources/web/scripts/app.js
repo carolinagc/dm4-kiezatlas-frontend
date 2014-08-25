@@ -73,9 +73,9 @@ app.controller('sidebarController', function($scope,frontendService, utilService
             return frontendService.getFacettedGeoObject(geoObjectId, facet_type_uris)
         }).then(function(response) {
             console.log("Detail geo object", response.data);
-            $scope.detailGeoObject = response.data;
             var details = {};
             var geoObjCategories = [];
+            $scope.detailGeoObject = response.data;
             angular.forEach(response.data.composite, function(detailsGeoObject) {
                 if (utilService.isArray(detailsGeoObject)) {
                     if (detailsGeoObject[0].type_uri.indexOf("criteria")>0 && detailsGeoObject[0].value != "" ) {

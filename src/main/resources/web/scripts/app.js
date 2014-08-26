@@ -17,6 +17,7 @@ var app = angular.module('kiezatlasFrontend', ['ngSanitize']);
 /* Controllers */
 
 app.controller('sidebarController', function($scope,frontendService, utilService) {
+    $scope.state="initial";
     var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
     var mkLayers = {};    
     frontendService.getAllCriteria().then(function(response) {
@@ -24,7 +25,7 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     });
 
     $scope.selectCriteria = function(selectedCriteria) {
-        if ($scope.currentCriteria != selectedCriteria ){$scope.map.removeMarkers();};
+        if ($scope.currentCriteria != selectedCriteria && $scope.state!="initial" ){$scope.map.clearLayers();};
         $scope.currentCriteria = selectedCriteria;
         frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
             $scope.state="category list";
@@ -47,11 +48,11 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                 var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
                 var lon = geoCoord["dm4.geomaps.longitude"].value;
                 var lat = geoCoord["dm4.geomaps.latitude"].value;
-                console.log(lon, lat);
+                console.log(lat, lon);
                 mkLayers[category.value].push([lat, lon]);
                 mkLayers[category.value].push(geoObject.id);
-
-//                $scope.map.addMarker(lon, lat, geoObject.id);
+                
+                //$scope.map.addMarker(lon, lat, geoObject.id);
             });
             
             $scope.mkLayers = mkLayers;
@@ -119,7 +120,7 @@ app.directive("leaflet", function() {
         template: '<div id="map"></div>',
         link: function(scope) {
             console.log("link function called")
-            var markersLayer = L.layerGroup();
+            var categoryLayers = L.layerGroup();
             var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             });
@@ -127,11 +128,13 @@ app.directive("leaflet", function() {
             var map = L.map('map', {
                 center: [52.5, 13.43],
                 zoom: 14,
-                layers: [baseLayer, markersLayer]
+                layers: [baseLayer, categoryLayers]
             });
+            var overlays = {};
             
             scope.map = {
                 showMarkerLayer: function(mkLayers) {
+                    var markersLayer = L.layerGroup();
                     for (i=0, len = mkLayers[scope.currentCategory.value].length; i<len; i=i+2) {
                         coord = mkLayers[scope.currentCategory.value][i];
                         geoObjectId = mkLayers[scope.currentCategory.value][i+1];
@@ -139,21 +142,41 @@ app.directive("leaflet", function() {
                         var marker = L.marker(coord).addTo(markersLayer).on('click', function(e) {
                             scope.showGeoObjectDetails(geoObjectId);
                         });
-;
+                        
                         console.log("MARKER", marker);
                     };
+                    
+
+                    overlays[scope.currentCategory.value] = markersLayer;
+                    console.log("OVERLAYS", overlays);
+                    
+                    //overlays[scope.currentCategory.value].addTo(map);
+                    overlays[scope.currentCategory.value].addTo(categoryLayers);
+                    
+                    console.log("ALL LAYERS", categoryLayers);
+                },
+                removeLayer: function(layer) {
+                    map.removeLayer(overlays[layer]);
                 },
                 
-                addMarker: function (lon, lat, geoObjectId) {
+                addLayer: function(layer) {
+                    map.addLayer(overlays[layer]);
+                },
+                
+                
+                /*
+                  addMarker: function (lon, lat, geoObjectId) {
                     var marker = L.marker([lat, lon]).addTo(markersLayer).on('click', function(e) {
-                        scope.showGeoObjectDetails(geoObjectId);
+                    scope.showGeoObjectDetails(geoObjectId);
                     });
                     console.log("ADD TO markersLayer" + markersLayer);
                     console.log("currentCategory is " + scope.currentCategory.value);
-                },
-                removeMarkers: function(){
-                    console.log("REMOVE markersLayer" + markersLayer);
-                    markersLayer.clearLayers();
+                    },
+                */
+                clearLayers: function(){
+                    // console.log("REMOVE markersLayer" + markersLayer);
+                    // if (markersLayer) { markersLayer.clearLayers(); }
+                    categoryLayers.clearLayers();
                 }
             }
         }

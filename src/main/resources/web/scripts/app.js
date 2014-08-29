@@ -37,15 +37,13 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                         gLayers[criteria.uri][category.value]=[];
                     }
                     
-                    
                     frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
-                        
- //                       geoObjects = geoObjects.data;
+ //                     geoObjects = geoObjects.data;
                         angular.forEach(response.data, function(geoObj) {
                             var geoCoord = geoObj.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
                             var lon = geoCoord["dm4.geomaps.longitude"].value;
                             var lat = geoCoord["dm4.geomaps.latitude"].value;
-//                            console.log(lat, lon);
+//                          console.log(lat, lon);
                             gLayers[criteria.uri][category.value].push([lat, lon]);
                             gLayers[criteria.uri][category.value].push(geoObj.id);
 
@@ -75,7 +73,6 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         });
     };
 
-
     $scope.selectCategory = function(category) {
         $scope.currentCategory = category;
         $scope.state="geo object list";
@@ -85,13 +82,10 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         console.log("GEOBJECTSAA IN GEO OBJECT LIST", gLayers[$scope.currentCriteria.uri]);
 */
         $scope.map.showMarkerLayer(gLayers, $scope.currentCriteria.uri, category.value); 
-
         frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
             $scope.geoObjects = response.data;
             console.log("GEOBJECTS IN GEO OBJECT LIST", response.data);
         });     
-
-
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
@@ -172,33 +166,24 @@ app.directive("leaflet", function() {
                 showMarkerLayer: function(gLayers, criteriaUri, categoryValue) {
                     var markersLayer = L.layerGroup();
                     for (i=0, len = gLayers[criteriaUri][categoryValue].length; i<len; i=i+2) {
-
                         coord = gLayers[criteriaUri][categoryValue][i];
-
-                     
                         geoObjectId = gLayers[criteriaUri][categoryValue][i+1];
-//                        console.log("Add coord to markersLayer", coord);
-
+//                      console.log("Add coord to markersLayer", coord);
                         var marker = L.marker(coord).addTo(markersLayer).on('click', function(e) {
                             alert(this.getLatLng())
                             scope.showGeoObjectDetails(geoObjectId);
 //                          console.log("GEOOBJECTID IN MARKER",geoObjectId);
                         });
-
                     };
-                    
 
                     overlays[categoryValue] = markersLayer;
                     overlays[categoryValue].addTo(categoryLayers);
 
                     if (categoryValue == "Erwachsene") {
                         console.log("OVERLAYS ERWACHSENE", overlays[categoryValue]);                    
-                        
                     };
-
-                    
-//                   console.log("CATEGORY LAYERS", categoryLayers);
-//                    console.log("OVERLAYS", overlays);
+//                  console.log("CATEGORY LAYERS", categoryLayers);
+//                  console.log("OVERLAYS", overlays);
 
                 },
                 removeLayer: function(layer) {
@@ -208,22 +193,9 @@ app.directive("leaflet", function() {
                 addLayer: function(categoryValue) {
 // TODO
 //                  map.addLayer(overlays[categoryValue]);
-  
                   scope.map.showMarkerLayer(scope.gLayers, scope.currentCriteria.uri, categoryValue); 
-
- 
                 },
                 
-                
-                /*
-                  addMarker: function (lon, lat, geoObjectId) {
-                    var marker = L.marker([lat, lon]).addTo(markersLayer).on('click', function(e) {
-                    scope.showGeoObjectDetails(geoObjectId);
-                    });
-                    console.log("ADD TO markersLayer" + markersLayer);
-                    console.log("currentCategory is " + scope.currentCategory.value);
-                    },
-                */
                 clearLayers: function(){
                     categoryLayers.clearLayers();
                 }

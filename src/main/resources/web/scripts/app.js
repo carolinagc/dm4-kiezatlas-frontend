@@ -32,35 +32,31 @@ app.controller('sidebarController', function($scope,frontendService, utilService
             frontendService.getCriteriaCategories(criteria.uri).then(function(response) {
                 categories = response.data.items;
 
-///////////###########
-
                 angular.forEach(response.data.items, function(category) {
                     if (!gLayers[criteria.uri].hasOwnProperty([category.value])) {
                         gLayers[criteria.uri][category.value]=[];
                     }
                     
                     
-                    frontendService.getGeoObjectsByCategory(category.id).then(function(geoObjects) {
+                    frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
                         
-                        $scope.geoObjects = geoObjects.data;
-                        angular.forEach(geoObjects.data, function(geoObject) {
-                            var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
+ //                       geoObjects = geoObjects.data;
+                        angular.forEach(response.data, function(geoObj) {
+                            var geoCoord = geoObj.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
                             var lon = geoCoord["dm4.geomaps.longitude"].value;
                             var lat = geoCoord["dm4.geomaps.latitude"].value;
 //                            console.log(lat, lon);
                             gLayers[criteria.uri][category.value].push([lat, lon]);
-                            gLayers[criteria.uri][category.value].push(geoObject.id);
+                            gLayers[criteria.uri][category.value].push(geoObj.id);
                         });
                         $scope.map.showMarkerLayer(gLayers, criteria.uri, category.value);                        
-                        $scope.map.clearLayers();
+                        $scope.map.clearLayers();                            
                     });     
                     
-                    
                 });
-                
+
                 console.log("gLAYERS", gLayers);     
                 $scope.gLayers = gLayers;
-                ///////////#########
                 
             });
         });
@@ -70,10 +66,8 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     $scope.selectCriteria = function(selectedCriteria) {
 //        if ($scope.currentCriteria != selectedCriteria && $scope.state!="initial" ){$scope.map.clearLayers();};
         if ($scope.currentCriteria != selectedCriteria){$scope.map.clearLayers();};
-
-
         $scope.currentCriteria = selectedCriteria;
-
+        
         frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
             $scope.state="category list";
             $scope.categories = response.data.items;
@@ -82,40 +76,21 @@ app.controller('sidebarController', function($scope,frontendService, utilService
 
 
     $scope.selectCategory = function(category) {
+        $scope.currentCategory = category;
+        $scope.state="geo object list";
+/*
+        $scope.geoObjects = gLayers[$scope.currentCriteria.uri];
+        console.log("GEOBJECTS IN GEO OBJECT LIST", gLayers[$scope.currentCriteria.uri]);
+*/
+        $scope.map.showMarkerLayer(gLayers, $scope.currentCriteria.uri, category.value); 
+
 
 
         frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
-            $scope.currentCategory = category;
-            $scope.state="geo object list";
-
-
             $scope.geoObjects = response.data;
             console.log(response.data);
-/*            
-              angular.forEach(response.data, function(geoObject) {
-
-
-                if (!mkLayers.hasOwnProperty(category.value)) {
-                    mkLayers[category.value]=[];
-                }
-                console.log("CURRENT CATEGORY", category.value);
-                var geoCoord = geoObject.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
-                var lon = geoCoord["dm4.geomaps.longitude"].value;
-                var lat = geoCoord["dm4.geomaps.latitude"].value;
-                console.log(lat, lon);
-                mkLayers[category.value].push([lat, lon]);
-                mkLayers[category.value].push(geoObject.id);
-                
-                //$scope.map.addMarker(lon, lat, geoObject.id);
-            });
-            
-            $scope.mkLayers = mkLayers;
-            console.log("MarkerLayers",mkLayers);
-            $scope.map.showMarkerLayer(mkLayers);
-*/
-
-            $scope.map.addLayer(category.value);
         });     
+
     };
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
@@ -155,7 +130,8 @@ app.controller('sidebarController', function($scope,frontendService, utilService
             $scope.details = details;
             $scope.geoObjCategories = geoObjCategories;
             console.log("details", $scope.details);
-            console.log("CATEGORY", geoObjCategories);
+            console.log("CATEGORIES", geoObjCategories);
+
         });
     };
 });
@@ -196,12 +172,12 @@ app.directive("leaflet", function() {
                     var markersLayer = L.layerGroup();
                     for (i=0, len = gLayers[criteriaUri][categoryValue].length; i<len; i=i+2) {
                         coord = gLayers[criteriaUri][categoryValue][i];
-                        if (categoryValue=="Erwachsene"){console.log("Erwachsene COORD",coord)};
                         geoObjectId = gLayers[criteriaUri][categoryValue][i+1];
                         console.log("Add coord to markersLayer", coord);
+                        overlays[categoryValue] = []
                         var marker = L.marker(coord).addTo(markersLayer).on('click', function(e) {
-                            //                            scope.showGeoObjectDetails(geoObjectId);
-                            //                            console.log("GEOOBJECTID IN MARKER",geoObjectId);
+                            scope.showGeoObjectDetails(geoObjectId);
+                            console.log("GEOOBJECTID IN MARKER",geoObjectId);
                         });
                         
                         console.log("MARKER", marker);
@@ -267,8 +243,6 @@ app.directive("leaflet", function() {
                 */
                 clearLayers: function(){
                     categoryLayers.clearLayers();
-                    console.log("CLEAR LAYERS", categoryLayers);
-
                 }
             }
         }

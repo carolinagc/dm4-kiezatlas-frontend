@@ -13,10 +13,6 @@ public class KiezatlasFrontendPlugin extends PluginActivator {
     @Path("/{id}")
     @Produces("text/html")
     public InputStream invokeFrontend() {
-        try {
-            return dms.getPlugin("de.kiezatlas.frontend").getResourceAsStream("web/index.html");
-        } catch (Exception e) {
-            throw new RuntimeException("Invoking frontend failed", e);
-        }
+            return getStaticResource("web/index.html");
     }
 }

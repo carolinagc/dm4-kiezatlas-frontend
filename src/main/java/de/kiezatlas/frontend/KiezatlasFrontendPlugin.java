@@ -13,6 +13,6 @@ public class KiezatlasFrontendPlugin extends PluginActivator {
     @Path("/{id}")
     @Produces("text/html")
     public InputStream invokeFrontend() {
-            return getStaticResource("web/index.html");
+        return getStaticResource("web/index.html");
     }
 }

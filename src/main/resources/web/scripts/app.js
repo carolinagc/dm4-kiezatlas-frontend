@@ -1,10 +1,10 @@
 /*
 ViewModel
     state - The state the application is in, there are 4 states: "initial", "category list", "geo object list", "geo object details"
-    criteria - the criteria shown upper/left (array of topics)
+    criteria - the criteria shown upper/right (array of topics)
     currentCriteria - selected criteria (topic)
-    criteriaCategories - the categories shown in the lower/left (array of topics)
-    geoObjects - the geoObjects of a specific category
+    criteriaCategories - the categories shown in the lower/right (array of topics)
+    geoObjects - the geoObjects of a specific category shown in the lower/right
     detailGeoObject - the details of a geoObject
     currentCategory - the selected category (topic)
     details - the details values of a geoObject (object)
@@ -24,18 +24,13 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     frontendService.getAllCriteria().then(function(response) {
         $scope.criteria = response.data;
         angular.forEach(response.data, function(criteria) {
+ 
+            gLayers[criteria.uri]=[];
             
-            if (!gLayers.hasOwnProperty(criteria.uri)) {
-                gLayers[criteria.uri]=[];
-            }
-           
             frontendService.getCriteriaCategories(criteria.uri).then(function(response) {
-                categories = response.data.items;
 
                 angular.forEach(response.data.items, function(category) {
-                    if (!gLayers[criteria.uri].hasOwnProperty([category.value])) {
-                        gLayers[criteria.uri][category.value]=[];
-                    }
+                    gLayers[criteria.uri][category.value]=[];
                     
                     frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
  //                     geoObjects = geoObjects.data;
@@ -166,18 +161,21 @@ app.directive("leaflet", function() {
                 showMarkerLayer: function(gLayers, criteriaUri, categoryValue) {
                     var markersLayer = L.layerGroup();
                     for (i=0, len = gLayers[criteriaUri][categoryValue].length; i<len; i=i+2) {
-                        coord = gLayers[criteriaUri][categoryValue][i];
-                        geoObjectId = gLayers[criteriaUri][categoryValue][i+1];
+                        var coord = gLayers[criteriaUri][categoryValue][i];
+                        var geoObjectId = gLayers[criteriaUri][categoryValue][i+1];
 //                      console.log("Add coord to markersLayer", coord);
-                        var marker = L.marker(coord).addTo(markersLayer).on('click', function(e) {
-                            alert(this.getLatLng())
+                        var marker = L.marker(coord).addTo(markersLayer).on('click', onclick(geoObjectId));
+                    };
+
+                    function onclick(geoObjectId) {
+                        return function() {
                             scope.showGeoObjectDetails(geoObjectId);
-//                          console.log("GEOOBJECTID IN MARKER",geoObjectId);
-                        });
+                        };
                     };
 
                     overlays[categoryValue] = markersLayer;
                     overlays[categoryValue].addTo(categoryLayers);
+//                    overlays[categoryValue].addTo(map);
 
                     if (categoryValue == "Erwachsene") {
                         console.log("OVERLAYS ERWACHSENE", overlays[categoryValue]);                    
@@ -192,12 +190,13 @@ app.directive("leaflet", function() {
                 
                 addLayer: function(categoryValue) {
 // TODO
-//                  map.addLayer(overlays[categoryValue]);
-                  scope.map.showMarkerLayer(scope.gLayers, scope.currentCriteria.uri, categoryValue); 
+                  map.addLayer(overlays[categoryValue]);
+//                  scope.map.showMarkerLayer(scope.gLayers, scope.currentCriteria.uri, categoryValue); 
                 },
                 
                 clearLayers: function(){
                     categoryLayers.clearLayers();
+//                    map.clearLayers();
                 }
             }
         }

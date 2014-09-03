@@ -1,6 +1,7 @@
 /*
 ViewModel
     state - The state the application is in, there are 4 states: "initial", "category list", "geo object list", "geo object details"
+    categoryLayers - An object that contains the category topic, the geo object markers layer, the visibility of the layer
     criteria - the criteria shown upper/right (array of topics)
     currentCriteria - selected criteria (topic)
     criteriaCategories - the categories shown in the lower/right (array of topics)
@@ -19,49 +20,20 @@ var app = angular.module('kiezatlasFrontend', ['ngSanitize']);
 app.controller('sidebarController', function($scope,frontendService, utilService) {
     $scope.state="initial";
     var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
-    var gLayers = {};    
-
+    var categoryLayers = {};
+    
     frontendService.getAllCriteria().then(function(response) {
         $scope.criteria = response.data;
         angular.forEach(response.data, function(criteria) {
- 
-            gLayers[criteria.uri]=[];
-            
-            frontendService.getCriteriaCategories(criteria.uri).then(function(response) {
-
-                angular.forEach(response.data.items, function(category) {
-                    gLayers[criteria.uri][category.value]=[];
-                    
-                    frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
- //                     geoObjects = geoObjects.data;
-                        angular.forEach(response.data, function(geoObj) {
-                            var geoCoord = geoObj.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
-                            var lon = geoCoord["dm4.geomaps.longitude"].value;
-                            var lat = geoCoord["dm4.geomaps.latitude"].value;
-//                          console.log(lat, lon);
-                            gLayers[criteria.uri][category.value].push([lat, lon]);
-                            gLayers[criteria.uri][category.value].push(geoObj.id);
-
-                        });
-                        $scope.map.showMarkerLayer(gLayers, criteria.uri, category.value);                        
-                        $scope.map.clearLayers();                            
-                    });     
-                    
-                });
-
-                console.log("gLAYERS", gLayers);     
-                $scope.gLayers = gLayers;
-                
-            });
+            categoryLayers[criteria.uri]=[];
         });
+
+        $scope.selectCriteria(response.data[4]);
     });          
 
 
     $scope.selectCriteria = function(selectedCriteria) {
-//        if ($scope.currentCriteria != selectedCriteria && $scope.state!="initial" ){$scope.map.clearLayers();};
-        if ($scope.currentCriteria != selectedCriteria){$scope.map.clearLayers();};
         $scope.currentCriteria = selectedCriteria;
-        
         frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
             $scope.state="category list";
             $scope.categories = response.data.items;
@@ -72,14 +44,32 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         $scope.currentCategory = category;
         $scope.state="geo object list";
 
-/* TODO 
-        $scope.geoObjects = gLayers[$scope.currentCriteria.uri];
-        console.log("GEOBJECTSAA IN GEO OBJECT LIST", gLayers[$scope.currentCriteria.uri]);
-*/
-        $scope.map.showMarkerLayer(gLayers, $scope.currentCriteria.uri, category.value); 
+// PENDING Create only if needed selected category propierty and fill it 
+
+        categoryLayers[$scope.currentCriteria.uri][category.uri] = [];            
+        categoryLayers[$scope.currentCriteria.uri][category.uri].push(category);            
+
+        console.log("CATEGORY LAYERS in selectCategory", categoryLayers);
         frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
             $scope.geoObjects = response.data;
             console.log("GEOBJECTS IN GEO OBJECT LIST", response.data);
+
+//Creating markers layer for the category selected
+
+            angular.forEach(response.data, function(geoObj) {
+                var geoCoord = geoObj.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
+                var lon = geoCoord["dm4.geomaps.longitude"].value;
+                var lat = geoCoord["dm4.geomaps.latitude"].value;
+            //                          console.log(lat, lon);
+                var coord=[lat,lon];
+                console.log("coord",  coord);
+                var categoryLayer = categoryLayers[$scope.currentCriteria.uri][category.uri];
+                $scope.map.addMarker(categoryLayer, coord, geoObj.id);
+                $scope.map.setLayerVisibility(categoryLayer, true);
+            });
+            $scope.categoryLayers = categoryLayers;
+            console.log("categoryLayers", categoryLayers);
+
         });     
     };
 
@@ -143,7 +133,7 @@ app.directive("leaflet", function() {
         template: '<div id="map"></div>',
         link: function(scope) {
             console.log("link function called")
-            var categoryLayers = L.layerGroup();
+            var layers = L.layerGroup();
             var baseLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             });
@@ -151,53 +141,42 @@ app.directive("leaflet", function() {
             var map = L.map('map', {
                 center: [52.5, 13.43],
                 zoom: 14,
-                layers: [baseLayer, categoryLayers]
+                layers: [baseLayer]
 
             });
 
-            var overlays = {};
-            
             scope.map = {
-                showMarkerLayer: function(gLayers, criteriaUri, categoryValue) {
-                    var markersLayer = L.layerGroup();
-                    for (i=0, len = gLayers[criteriaUri][categoryValue].length; i<len; i=i+2) {
-                        var coord = gLayers[criteriaUri][categoryValue][i];
-                        var geoObjectId = gLayers[criteriaUri][categoryValue][i+1];
-//                      console.log("Add coord to markersLayer", coord);
-                        var marker = L.marker(coord).addTo(markersLayer).on('click', onclick(geoObjectId));
-                    };
+                createLayer: function() {
+                    return  L.layerGroup();
+                    
+                },
 
+                addMarker: function(categoryLayer, coord, geoObjectId) {
+                    var markersLayer = L.layerGroup();
+                    var marker = L.marker(coord).addTo(markersLayer).on('click', onclick(geoObjectId));
                     function onclick(geoObjectId) {
                         return function() {
                             scope.showGeoObjectDetails(geoObjectId);
                         };
                     };
 
-                    overlays[categoryValue] = markersLayer;
-                    overlays[categoryValue].addTo(categoryLayers);
-//                    overlays[categoryValue].addTo(map);
-
-                    if (categoryValue == "Erwachsene") {
-                        console.log("OVERLAYS ERWACHSENE", overlays[categoryValue]);                    
-                    };
-//                  console.log("CATEGORY LAYERS", categoryLayers);
-//                  console.log("OVERLAYS", overlays);
+                    categoryLayer.push(markersLayer);            
+                    markersLayer.addTo(map);
 
                 },
-                removeLayer: function(layer) {
-                    map.removeLayer(overlays[layer]);
-                },
-                
-                addLayer: function(categoryValue) {
-// TODO
-                  map.addLayer(overlays[categoryValue]);
-//                  scope.map.showMarkerLayer(scope.gLayers, scope.currentCriteria.uri, categoryValue); 
-                },
-                
-                clearLayers: function(){
-                    categoryLayers.clearLayers();
-//                    map.clearLayers();
+                setLayerVisibility: function(categoryLayer, visibility ) {
+                    if (visibility) {
+                        if (!map.hasLayer(categoryLayer)) {
+                            map.addLayer(categoryLayer[1]);
+                        }
+                    
+                    } else {
+                        if (map.hasLayer(categoryLayer)) {
+                            map.removeLayer(categoryLayer[1]);
+                        }
+                    }
                 }
+                
             }
         }
     };
@@ -243,4 +222,8 @@ app.service("utilService", function() {
     this.isArray = function(obj) {
         return Object.prototype.toString.call(obj) == "[object Array]"
     };
+
+    this.areCategoriesLoaded = function (criteriaUri){
+
+    }
 });

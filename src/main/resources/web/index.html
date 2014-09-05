@@ -19,7 +19,7 @@
           Filter categories: <input type="text" ng-model="value">
           <ul>
             <li ng-repeat="category in categories | filter:value | orderBy:'value'">
-              <a href ng-click="selectCategory(category)">{{category.value}} </a> (<a href ng-click="map.setLayerVisibility(categoryLayers[currentCriteria.uri][category.uri], false)">hide</a>) | (<a href ng-click="selectCategory(category)">show</a>)
+              <a href ng-click="selectCategory(category)">{{category.value}} </a> (<a href ng-click="switchVisibility(category)">switch</a>)
             </li>
           </ul>
         </div>

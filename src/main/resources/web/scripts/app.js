@@ -95,6 +95,15 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     }
 
 
+    $scope.switchVisibility = function(category) {
+                if ($scope.categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"]) {
+                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
+                } else {
+                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], true);
+                }
+    };
+
+
     $scope.showGeoObjectDetails = function(geoObjectId) {
         console.log("when showDetails the STATE is: " + $scope.state);
         $scope.state="geo object details";

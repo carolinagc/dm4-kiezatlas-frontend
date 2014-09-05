@@ -10,6 +10,7 @@ ViewModel
     currentCategory - the selected category (topic)
     details - the details values of a geoObject (object)
     geoObjCategories - the categories of a geoObject shown in geo object details (array)
+    markersLayer - object with the markers of a specific category
 */
 
 
@@ -33,6 +34,10 @@ app.controller('sidebarController', function($scope,frontendService, utilService
 
 
     $scope.selectCriteria = function(selectedCriteria) {
+        if ($scope.currentCriteria != selectedCriteria && $scope.currentCriteria) {
+            hideCategoryLayers($scope.categoryLayers, $scope.currentCriteria);
+        }
+       
         $scope.currentCriteria = selectedCriteria;
         frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
             $scope.state="category list";
@@ -44,14 +49,12 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         $scope.currentCategory = category;
         $scope.state="geo object list";
 
+// Check if the category propierty exists, if it does just load, if not create it 
+
         var loadedCategories = utilService.areCategoriesLoaded($scope.categoryLayers, $scope.currentCriteria.uri, category.uri);
         if (loadedCategories) {
             $scope.map.setLayerVisibility(categoryLayers[$scope.currentCriteria.uri][category.uri], true);
-            console.log("areCategoriesLoaded LALALLALALA");
         } else {
-
-// Create only if needed selected category propierty and fill it 
-
             categoryLayers[$scope.currentCriteria.uri][category.uri] = [];            
             categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = {};
             categoryLayers[$scope.currentCriteria.uri][category.uri].push(category);            
@@ -61,6 +64,7 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                 $scope.geoObjects = response.data;
                 console.log("GEOBJECTS IN GEO OBJECT LIST", response.data);
                 $scope.markersLayer = $scope.map.createLayer();
+
 //Creating markers layer for the category selected
 
                 angular.forEach(response.data, function(geoObj) {
@@ -69,9 +73,7 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                     var lat = geoCoord["dm4.geomaps.latitude"].value;
                     var coord=[lat,lon];
                     console.log("coord",  coord);
-//                    var categoryLayer = categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"];
                     $scope.map.addMarker(categoryLayers, category.uri, coord, geoObj.id);
-
                 });
                 
                 categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = $scope.markersLayer;
@@ -81,6 +83,16 @@ app.controller('sidebarController', function($scope,frontendService, utilService
             });     
         };
     };
+
+
+
+    hideCategoryLayers = function(categoryLayers, currentCriteria) {
+        for (var cat in categoryLayers[currentCriteria.uri]) {
+        console.log("HIDE CATEGORIES", categoryLayers[currentCriteria.uri][cat]);
+            $scope.map.setLayerVisibility(categoryLayers[currentCriteria.uri][cat], false);
+        }
+    }
+
 
     $scope.showGeoObjectDetails = function(geoObjectId) {
         console.log("when showDetails the STATE is: " + $scope.state);
@@ -108,7 +120,6 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                     if (detailsGeoObject.type_uri == "ka2.kontakt") {
                         angular.forEach(detailsGeoObject.composite, function(kontakt) {
                             details[kontakt.type_uri]= kontakt.value ;
-//                            console.log("KONTAKT Value is", kontakt.type_uri, kontakt.value)
                         });
                     } else { 
                         details[detailsGeoObject.type_uri]= detailsGeoObject.value ;
@@ -225,7 +236,7 @@ app.service("utilService", function() {
         return Object.prototype.toString.call(obj) == "[object Array]"
     };
 
-    this.areCategoriesLoaded = function (categoryLayers, criteriaUri, categoryUri){
+    this.areCategoriesLoaded = function(categoryLayers, criteriaUri, categoryUri) {
         return categoryLayers[criteriaUri][categoryUri]
     }
 });

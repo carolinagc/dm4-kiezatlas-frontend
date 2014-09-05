@@ -96,11 +96,17 @@ app.controller('sidebarController', function($scope,frontendService, utilService
 
 
     $scope.switchVisibility = function(category) {
-                if ($scope.categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"]) {
-                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
-                } else {
-                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], true);
-                }
+        if (!$scope.categoryLayers[$scope.currentCriteria.uri][category.uri]) {
+            $scope.selectCategory(category);
+            $scope.state="category list";
+//                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
+        } else {
+            if ($scope.categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"]) {
+                $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
+            } else {
+                $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], true);
+            }
+        }
     };
 
 

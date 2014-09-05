@@ -57,6 +57,7 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         } else {
             categoryLayers[$scope.currentCriteria.uri][category.uri] = [];            
             categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = {};
+            categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"];
             categoryLayers[$scope.currentCriteria.uri][category.uri].push(category);            
             
             console.log("CATEGORY LAYERS in selectCategory", categoryLayers);
@@ -182,11 +183,13 @@ app.directive("leaflet", function() {
                     if (visibility) {
                         if (!map.hasLayer(categoryLayer["layer"])) {
                             map.addLayer(categoryLayer["layer"]);
+                            categoryLayer["visibility"] = true;
                         }
                     
                     } else {
                         if (map.hasLayer(categoryLayer["layer"])) {
                             map.removeLayer(categoryLayer["layer"]);
+                            categoryLayer["visibility"] = false;
                         }
                     }
                 }

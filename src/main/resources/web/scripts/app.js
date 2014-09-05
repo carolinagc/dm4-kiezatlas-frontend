@@ -59,8 +59,8 @@ app.controller('sidebarController', function($scope,frontendService, utilService
             categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = {};
             categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"];
             categoryLayers[$scope.currentCriteria.uri][category.uri].push(category);            
-            
             console.log("CATEGORY LAYERS in selectCategory", categoryLayers);
+            
             frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
                 $scope.geoObjects = response.data;
                 console.log("GEOBJECTS IN GEO OBJECT LIST", response.data);
@@ -86,20 +86,17 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     };
 
 
-
     hideCategoryLayers = function(categoryLayers, currentCriteria) {
         for (var cat in categoryLayers[currentCriteria.uri]) {
-        console.log("HIDE CATEGORIES", categoryLayers[currentCriteria.uri][cat]);
             $scope.map.setLayerVisibility(categoryLayers[currentCriteria.uri][cat], false);
         }
     }
 
-
+    
     $scope.switchVisibility = function(category) {
         if (!$scope.categoryLayers[$scope.currentCriteria.uri][category.uri]) {
             $scope.selectCategory(category);
             $scope.state="category list";
-//                    $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
         } else {
             if ($scope.categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"]) {
                 $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);

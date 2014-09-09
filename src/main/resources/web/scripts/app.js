@@ -22,23 +22,27 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     $scope.state="initial";
     var siteId=location.pathname.match(/\/website\/(\d+)/)[1];
     var categoryLayers = {};
-    
+    var categoryLayersPre = {}
+
     frontendService.getAllCriteria().then(function(response) {
         $scope.criteria = response.data;
         $scope.selectCriteria(response.data[4]);
         angular.forEach(response.data, function(criteria) {
             categoryLayers[criteria.uri]=[];
+            categoryLayersPre[criteria.uri]=[];
         });
         $scope.categoryLayers = categoryLayers;
+        $scope.categoryLayersPre = categoryLayersPre;
+
     });          
 
 
     $scope.selectCriteria = function(selectedCriteria) {
-        if ($scope.currentCriteria != selectedCriteria && $scope.currentCriteria) {
-            hideCategoryLayers($scope.categoryLayers, $scope.currentCriteria);
-        }
-       
+
+        hideCategoryLayers($scope.categoryLayers, $scope.currentCriteria, selectedCriteria);
         $scope.currentCriteria = selectedCriteria;
+        showPreCategoryLayers($scope.categoryLayersPre, $scope.currentCriteria, $scope.categoryLayers);
+
         frontendService.getCriteriaCategories(selectedCriteria.uri).then(function(response) {
             $scope.state="category list";
             $scope.categories = response.data.items;
@@ -86,11 +90,25 @@ app.controller('sidebarController', function($scope,frontendService, utilService
     };
 
 
-    hideCategoryLayers = function(categoryLayers, currentCriteria) {
-        for (var cat in categoryLayers[currentCriteria.uri]) {
-            $scope.map.setLayerVisibility(categoryLayers[currentCriteria.uri][cat], false);
+    hideCategoryLayers = function(categoryLayers, currentCriteria, selectedCriteria) {
+        if ($scope.currentCriteria != selectedCriteria && $scope.state!="initial") {
+            for (var cat in categoryLayers[currentCriteria.uri]) {
+                $scope.categoryLayersPre[currentCriteria.uri][cat] = categoryLayers[currentCriteria.uri][cat]["visibility"];
+                console.log("CategoryLayer PRE",categoryLayersPre);
+                $scope.map.setLayerVisibility(categoryLayers[currentCriteria.uri][cat], false);
+            }
         }
     }
+
+    showPreCategoryLayers = function(categoryLayersPre, currentCriteria, categoryLayers) {
+        if ($scope.state != "initial") {
+            for (var cat in categoryLayers[currentCriteria.uri]) {
+                var visibility = $scope.categoryLayersPre[currentCriteria.uri][cat];
+                $scope.map.setLayerVisibility(categoryLayers[$scope.currentCriteria.uri][cat], visibility);
+            }
+        }
+    }
+
 
     
     $scope.switchVisibility = function(category) {

@@ -54,24 +54,28 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         $scope.state="geo object list";
 
 // Check if the category propierty exists, if it does just load, if not create it 
-
+        console.log("GEOOBJECT IN SELEC CATEGORY", $scope.geoObjects);
         var loadedCategories = utilService.areCategoriesLoaded($scope.categoryLayers, $scope.currentCriteria.uri, category.uri);
         if (loadedCategories) {
             $scope.map.setLayerVisibility(categoryLayers[$scope.currentCriteria.uri][category.uri], true);
+            frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
+                $scope.geoObjects = response.data;
+            });
+
         } else {
             categoryLayers[$scope.currentCriteria.uri][category.uri] = [];            
             categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = {};
             categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"];
             categoryLayers[$scope.currentCriteria.uri][category.uri].push(category);            
             console.log("CATEGORY LAYERS in selectCategory", categoryLayers);
-            
+                    
             frontendService.getGeoObjectsByCategory(category.id).then(function(response) {
                 $scope.geoObjects = response.data;
                 console.log("GEOBJECTS IN GEO OBJECT LIST", response.data);
                 $scope.markersLayer = $scope.map.createLayer();
-
-//Creating markers layer for the category selected
-
+            
+            //Creating markers layer for the category selected
+                
                 angular.forEach(response.data, function(geoObj) {
                     var geoCoord = geoObj.composite["dm4.contacts.address"].composite["dm4.geomaps.geo_coordinate"].composite;
                     var lon = geoCoord["dm4.geomaps.longitude"].value;
@@ -83,6 +87,7 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                 
                 categoryLayers[$scope.currentCriteria.uri][category.uri]["layer"] = $scope.markersLayer;
                 $scope.map.setLayerVisibility(categoryLayers[$scope.currentCriteria.uri][category.uri], true);
+                $scope.categoryLayersPre[$scope.currentCriteria.uri][category.uri] = true;
                 $scope.categoryLayers = categoryLayers;
                 console.log("categoryLayers", categoryLayers);
             });     
@@ -96,9 +101,9 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                 $scope.categoryLayersPre[currentCriteria.uri][cat] = categoryLayers[currentCriteria.uri][cat]["visibility"];
                 console.log("CategoryLayer PRE",categoryLayersPre);
                 $scope.map.setLayerVisibility(categoryLayers[currentCriteria.uri][cat], false);
-            }
-        }
-    }
+            };
+        };
+    };
 
     showPreCategoryLayers = function(categoryLayersPre, currentCriteria, categoryLayers) {
         if ($scope.state != "initial") {
@@ -118,6 +123,8 @@ app.controller('sidebarController', function($scope,frontendService, utilService
         } else {
             if ($scope.categoryLayers[$scope.currentCriteria.uri][category.uri]["visibility"]) {
                 $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], false);
+                $scope.categoryLayersPre[$scope.currentCriteria.uri][category.uri] = false;
+
             } else {
                 $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], true);
             }
@@ -220,6 +227,7 @@ app.directive("leaflet", function() {
                         if (map.hasLayer(categoryLayer["layer"])) {
                             map.removeLayer(categoryLayer["layer"]);
                             categoryLayer["visibility"] = false;
+                            categoryLayerPre = false;;
                         }
                     }
                 }

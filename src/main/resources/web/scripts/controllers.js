@@ -1,6 +1,6 @@
 /*
 ViewModel
-    state - The state the application is in, there are 4 states: "initial", "category list", "geo object list", "geo object details"
+    state - The state the application is in, there are 4 states: "initial", "category list", "geo object list", "geo object details", "search"
     categoryLayers - An object that contains the category topic, the geo object markers layer, the visibility of the layer
     criteria - the criteria shown upper/right (array of topics)
     currentCriteria - selected criteria (topic)
@@ -11,6 +11,7 @@ ViewModel
     details - the details values of a geoObject (object)
     geoObjCategories - the categories of a geoObject shown in geo object details (array)
     markersLayer - object with the markers of a specific category
+    searchGeoObjects - geo objects containing the search term in their name (array)
 */
 
 
@@ -127,6 +128,20 @@ app.controller('sidebarController', function($scope,frontendService, utilService
                 $scope.map.setLayerVisibility($scope.categoryLayers[$scope.currentCriteria.uri][category.uri], true);
             }
         }
+    };
+
+
+    $scope.searchGeoObjects = function(event) {
+      
+        if (event.keyCode ==13) {
+            var searchTerm = $scope.searchTerm;
+            $scope.state="search";
+            console.log("searchTerm", $scope.searchTerm);
+            frontendService.searchGeoObjects(searchTerm).then(function(geoObjects) {
+                console.log("searchObjects", geoObjects.data.items);
+                $scope.geoObjectsSearch = geoObjects.data.items;
+            })
+        } 
     };
 
 

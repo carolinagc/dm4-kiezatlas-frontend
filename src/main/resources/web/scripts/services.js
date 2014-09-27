@@ -14,6 +14,15 @@ app.service("frontendService", function($http) {
         return $http.get("/site/category/" + categoryId + "/objects?fetch_composite=true");
     };
     
+    this.searchGeoObjects = function(searchTerm) {
+        return $http.get("/site/geoobject?search=" + searchTerm)
+    };
+
+    this.searchCategories = function(searchTerm) {
+        return $http.get("/site/category/objects?search=" + searchTerm)
+    };
+
+
     this.getWebsiteFacets = function(websiteId) {
         return $http.get("/site/" + websiteId + "/facets");
     };
@@ -21,6 +30,7 @@ app.service("frontendService", function($http) {
     this.getFacettedGeoObject = function(geoObjectId, facetTypeUris) {
         return $http.get("/facet/topic/" + geoObjectId + "?" + queryString("facet_type_uri", facetTypeUris))
     };
+
     
     function queryString(paramName, values) {
         var params = [];

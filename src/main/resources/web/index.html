@@ -13,7 +13,13 @@
       <leaflet></leaflet>
     
       <div id="sideBar">
-        <div id="search"> <input type="text" ng-model="searchTerm" ng-keyup="searchGeoObjectsOnCategories()"></div>
+        <div id="search"> 
+          <input type="text" ng-model="searchTerm" ng-keypress="searchGeoObjects($event)">
+ 
+          <ul ng-if="state=='search'">
+            <li ng-repeat="geoObject in geoObjectsSearch"> <a href ng-click="showGeoObjectDetails(geoObject.id)">{{geoObject.value}}</a></li>
+          </ul>
+        </div>
         <ul>
           <li ng-repeat="criterion in criteria" > <a href ng-click="selectCriteria(criterion)">{{criterion.value}}</a></li>
         </ul>
